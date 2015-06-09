@@ -1,0 +1,34 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        "location"
+    ],
+    "companyName": "marc.burkhardt@gmx.de",
+    "longName": "New Yorker Lions",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/LionsLogosehrklein.png",
+                "menuIcon": true,
+                "name": "IMAGE_LIONS_LOGO_SEHRKLEIN",
+                "type": "png"
+            },
+            {
+                "file": "images/LionsLogoklein2.png",
+                "name": "IMAGE_LIONS_LOGO2",
+                "type": "png"
+            }
+        ]
+    },
+    "sdkVersion": "3",
+    "shortName": "New Yorker Lions",
+    "targetPlatforms": [
+        "basalt"
+    ],
+    "uuid": "7c950a0a-8051-4072-9958-7c5304bc09e1",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
