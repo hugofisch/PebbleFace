@@ -8,13 +8,33 @@ static BitmapLayer *s_battery_layer;
 static GBitmap *s_battery_bitmap;
 static BitmapLayer *s_bluetooth_layer;
 static GBitmap *s_bluetooth_bitmap;
-static TextLayer *s_accel_layer;
+static TextLayer *s_countdown_layer;
+static TextLayer *s_vs_layer;
 
 static uint8_t s_charge_percent=0;
 static bool s_is_charging=false;
 static bool s_is_plugged=false;
 static bool s_connected=false;
 
+#define NUM_GAMEDAYS 7
+typedef struct {
+ char *name;
+ time_t time;
+  bool home;
+} GameDay;
+
+
+// Time calculated from https://www.aritso.net/mehr-informationen/tools/timestampconverter.htm
+// locatime UTC+2 !!!
+static GameDay s_game_day[] = {
+ { .name = "vs Unicorns", .time = 1434816000, .home = true },
+ { .name = "vs Huskies", .time = 1437840000, .home = true },
+ { .name = "Hurricanes vs", .time = 1438437600, .home = false },
+{ .name = "vs Rebbels", .time = 1439042400, .home = true },
+  { .name = "Huskies vs", .time = 1439650800, .home = false },
+  { .name = "Panther vs", .time = 1440255600, .home = false },
+  { .name = "vs Adler", .time = 1441468800, .home = true }
+};
 
 static void update_time() {
   // Get a tm structure
@@ -83,15 +103,35 @@ static void update_time() {
     if (s_connected)
     {
       gbitmap_destroy(s_bluetooth_bitmap);
-      s_bluetooth_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH_OK);
+      s_bluetooth_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH_WHITE_OK);
       bitmap_layer_set_bitmap(s_bluetooth_layer, s_bluetooth_bitmap); 
     }
     else
     {
       gbitmap_destroy(s_bluetooth_bitmap);
-      s_bluetooth_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH_NOTOK);
+      s_bluetooth_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH_WHITE_NOTOK);
       bitmap_layer_set_bitmap(s_bluetooth_layer, s_bluetooth_bitmap);       
     }
+  }
+ 
+  time_t temptime = time(NULL); 
+  static char diffbuffer[] = "000:00:00:00";
+  bool found=false;
+  for (int i=0;i<NUM_GAMEDAYS;i++){
+    GameDay *gameday = &s_game_day[i];
+    time_t diff=difftime(gameday->time,temptime)-60*60*24;  // minus 1 Day :-)
+    if (diff>=0){
+      struct tm *tick_time = gmtime(&diff);
+      strftime(diffbuffer, sizeof("000:00:00:00"), "%j:%H:%M:%S", tick_time);
+      text_layer_set_text(s_countdown_layer, diffbuffer);
+      text_layer_set_text(s_vs_layer, gameday->name);
+      found=true;
+      break;
+    }
+  }  
+  if (found){
+    text_layer_set_text(s_countdown_layer, "000:00:00:00");
+    text_layer_set_text(s_vs_layer, "unknown");
   }
 }
 
@@ -101,17 +141,22 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 
 static void accel_tap_handler(AccelAxisType axis, int32_t direction)
 {
-    /*if(direction > 0)
+
+    if(direction > 0)
     {
       layer_set_hidden(text_layer_get_layer(s_time_layer),true);
-      layer_set_hidden(text_layer_get_layer(s_accel_layer),false);
+      layer_set_hidden(text_layer_get_layer(s_date_layer),true);
+      layer_set_hidden(text_layer_get_layer(s_countdown_layer),false);
+      layer_set_hidden(text_layer_get_layer(s_vs_layer),false);
     }
     else
     {
       layer_set_hidden(text_layer_get_layer(s_time_layer),false);
-      layer_set_hidden(text_layer_get_layer(s_accel_layer),true);
+      layer_set_hidden(text_layer_get_layer(s_date_layer),false);
+      layer_set_hidden(text_layer_get_layer(s_countdown_layer),true);
+      layer_set_hidden(text_layer_get_layer(s_vs_layer),true);
     }
-    */
+    
 }
 
 static void batterie_handler(BatteryChargeState charge)
@@ -147,8 +192,8 @@ static void main_window_load(Window *window) {
   
   //---------------------------
   // Create Bluetooth GBitmap, then set to created BitmapLayer
-  s_bluetooth_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH_NOTOK);
-  s_bluetooth_layer = bitmap_layer_create(GRect(0, 0, 12, 16));
+  s_bluetooth_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH_WHITE_NOTOK);
+  s_bluetooth_layer = bitmap_layer_create(GRect(0, 0, 20, 20));
   bitmap_layer_set_bitmap(s_bluetooth_layer, s_bluetooth_bitmap);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_bluetooth_layer));
   //---------------------------
@@ -183,17 +228,30 @@ static void main_window_load(Window *window) {
   //---------------------------
    
   //---------------------------
-  //Setup Accel Layer
-  s_accel_layer = text_layer_create(GRect(5, 116, 139, 50));
-  text_layer_set_background_color(s_accel_layer, GColorClear);
-  text_layer_set_text_color(s_accel_layer, GColorWhite);  
-  text_layer_set_font(s_accel_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
-  text_layer_set_text(s_accel_layer, "Accel");
-  text_layer_set_text_alignment(s_accel_layer, GTextAlignmentCenter);
-  layer_set_hidden(text_layer_get_layer(s_accel_layer),true);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_accel_layer));
+  //Setup Countdown Layer
+  s_countdown_layer = text_layer_create(GRect(5, 122, 139, 18));
+  text_layer_set_background_color(s_countdown_layer, GColorClear);
+  text_layer_set_text_color(s_countdown_layer, GColorWhite);  
+  text_layer_set_font(s_countdown_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  text_layer_set_text(s_countdown_layer, "000:00:00:00");
+  text_layer_set_text_alignment(s_countdown_layer, GTextAlignmentCenter);
+  layer_set_hidden(text_layer_get_layer(s_countdown_layer),true);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_countdown_layer));
   //---------------------------
-    
+
+  //---------------------------
+  //Setup VS Layer
+  s_vs_layer = text_layer_create(GRect(5, 140, 139, 18));
+  text_layer_set_background_color(s_vs_layer, GColorClear);
+  text_layer_set_text_color(s_vs_layer, GColorWhite);  
+  text_layer_set_font(s_vs_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  text_layer_set_text(s_vs_layer, "vs unkown");
+  text_layer_set_text_alignment(s_vs_layer, GTextAlignmentCenter);
+  layer_set_hidden(text_layer_get_layer(s_vs_layer),true);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_vs_layer));
+  //---------------------------
+
+  
 }
 
 static void main_window_unload(Window *window) {
@@ -247,9 +305,11 @@ static void init() {
 
   //Subscribe BatterieService
   battery_state_service_subscribe(batterie_handler);
+   batterie_handler(battery_state_service_peek());
   
-  //SUbscribe BluetoothService
-   bluetooth_connection_service_subscribe(bluetooth_handler);
+  //Subscribe BluetoothService
+  bluetooth_connection_service_subscribe(bluetooth_handler);
+  bluetooth_handler(bluetooth_connection_service_peek());
   
   // Make sure the time is displayed from the start
   update_time();

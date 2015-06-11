@@ -9,6 +9,16 @@
     "resources": {
         "media": [
             {
+                "file": "images/bluetoothwhiteNOTOK.png",
+                "name": "IMAGE_BLUETOOTH_WHITE_NOTOK",
+                "type": "png"
+            },
+            {
+                "file": "images/bluetoothwhiteOK.png",
+                "name": "IMAGE_BLUETOOTH_WHITE_OK",
+                "type": "png"
+            },
+            {
                 "file": "images/bluetoothNOK.png",
                 "name": "IMAGE_BLUETOOTH_NOTOK",
                 "type": "png"
