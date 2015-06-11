@@ -9,6 +9,46 @@
     "resources": {
         "media": [
             {
+                "file": "images/bluetoothNOK.png",
+                "name": "IMAGE_BLUETOOTH_NOTOK",
+                "type": "png"
+            },
+            {
+                "file": "images/bluetoothOK.png",
+                "name": "IMAGE_BLUETOOTH_OK",
+                "type": "png"
+            },
+            {
+                "file": "images/batterie75.png",
+                "name": "IMAGE_BATTERY_75",
+                "type": "png"
+            },
+            {
+                "file": "images/batterieempty.png",
+                "name": "IMAGE_BATTERY_EMPTY",
+                "type": "png"
+            },
+            {
+                "file": "images/batteriepower.png",
+                "name": "IMAGE_BATTERY_CHARGE",
+                "type": "png"
+            },
+            {
+                "file": "images/batteriefull.png",
+                "name": "IMAGE_BATTERY_FULL",
+                "type": "png"
+            },
+            {
+                "file": "images/batterie50.png",
+                "name": "IMAGE_BATTERY_50",
+                "type": "png"
+            },
+            {
+                "file": "images/batterie25.png",
+                "name": "IMAGE_BATTERY_25",
+                "type": "png"
+            },
+            {
                 "file": "images/LionsLogosehrklein.png",
                 "menuIcon": true,
                 "name": "IMAGE_LIONS_LOGO_SEHRKLEIN",
