@@ -15,6 +15,8 @@ static uint8_t s_charge_percent=0;
 static bool s_is_charging=false;
 static bool s_is_plugged=false;
 static bool s_connected=false;
+static time_t s_displaytimer=0;
+static bool s_displaycountdown=false;
 
 #define NUM_GAMEDAYS 7
 typedef struct {
@@ -35,6 +37,15 @@ static GameDay s_game_day[] = {
   { .name = "Panther vs", .time = 1440255600, .home = false },
   { .name = "vs Adler", .time = 1441468800, .home = true }
 };
+
+
+static void show_time_or_countdown()
+{
+  layer_set_hidden(text_layer_get_layer(s_time_layer),s_displaycountdown);
+  layer_set_hidden(text_layer_get_layer(s_date_layer),s_displaycountdown);
+  layer_set_hidden(text_layer_get_layer(s_countdown_layer),!s_displaycountdown);
+  layer_set_hidden(text_layer_get_layer(s_vs_layer),!s_displaycountdown);
+}
 
 static void update_time() {
   // Get a tm structure
@@ -70,13 +81,13 @@ static void update_time() {
     s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_CHARGE);
     bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
   } else {
-    if (s_charge_percent<25)
+    if (s_charge_percent<21)
     {
       gbitmap_destroy(s_battery_bitmap);
       s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_EMPTY);
       bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap); 
     }
-    if ((s_charge_percent>=25)&&(s_charge_percent<50))
+    if ((s_charge_percent>=21)&&(s_charge_percent<50))
     {
       gbitmap_destroy(s_battery_bitmap);
       s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_25);
@@ -88,13 +99,13 @@ static void update_time() {
       s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_50);
       bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap); 
     }
-    if ((s_charge_percent>=75)&&(s_charge_percent<100))
+    if ((s_charge_percent>=75)&&(s_charge_percent<=90))
     {
       gbitmap_destroy(s_battery_bitmap);
       s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_75);
       bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap); 
     }
-    if ((s_charge_percent==100))
+    if ((s_charge_percent>90))
     {
       gbitmap_destroy(s_battery_bitmap);
       s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_FULL);
@@ -113,25 +124,39 @@ static void update_time() {
       bitmap_layer_set_bitmap(s_bluetooth_layer, s_bluetooth_bitmap);       
     }
   }
- 
-  time_t temptime = time(NULL); 
-  static char diffbuffer[] = "000:00:00:00";
-  bool found=false;
-  for (int i=0;i<NUM_GAMEDAYS;i++){
-    GameDay *gameday = &s_game_day[i];
-    time_t diff=difftime(gameday->time,temptime)-60*60*24;  // minus 1 Day :-)
-    if (diff>=0){
-      struct tm *tick_time = gmtime(&diff);
-      strftime(diffbuffer, sizeof("000:00:00:00"), "%j:%H:%M:%S", tick_time);
-      text_layer_set_text(s_countdown_layer, diffbuffer);
-      text_layer_set_text(s_vs_layer, gameday->name);
-      found=true;
-      break;
+  
+  if (s_displaycountdown)
+  {
+    show_time_or_countdown();
+    time_t temptime = time(NULL); 
+    int timetodisplay=(int)(temptime-s_displaytimer);
+    if (timetodisplay<5){
+      static char diffbuffer[] = "000:00:00:00";
+      bool found=false;
+      for (int i=0;i<NUM_GAMEDAYS;i++){
+        GameDay *gameday = &s_game_day[i];
+        time_t diff=difftime(gameday->time,temptime);
+        if (diff>=0){
+          int nDays,nHours,nMinutes,nSeconds;
+          nDays=(int)diff/(60*60*24);
+          nHours=(int)(diff-60*60*24*nDays)/(60*60);
+          nMinutes=(int)(diff-60*60*24*nDays-60*60*nHours)/60;
+          nSeconds=(int)(diff-60*60*24*nDays-60*60*nHours-60*nMinutes);
+          snprintf(diffbuffer, sizeof("000:00:00:00"),"%03d:%02d:%02d:%02d",nDays,nHours,nMinutes,nSeconds);
+          text_layer_set_text(s_countdown_layer, diffbuffer);
+          text_layer_set_text(s_vs_layer, gameday->name);
+          found=true;
+          break;
+        }
+      }  
+      if (!found){
+        text_layer_set_text(s_countdown_layer, "000:00:00:00");
+        text_layer_set_text(s_vs_layer, "unknown");
+      }
+    } else {
+      s_displaycountdown=false;
+      show_time_or_countdown();
     }
-  }  
-  if (found){
-    text_layer_set_text(s_countdown_layer, "000:00:00:00");
-    text_layer_set_text(s_vs_layer, "unknown");
   }
 }
 
@@ -141,22 +166,10 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 
 static void accel_tap_handler(AccelAxisType axis, int32_t direction)
 {
-
-    if(direction > 0)
-    {
-      layer_set_hidden(text_layer_get_layer(s_time_layer),true);
-      layer_set_hidden(text_layer_get_layer(s_date_layer),true);
-      layer_set_hidden(text_layer_get_layer(s_countdown_layer),false);
-      layer_set_hidden(text_layer_get_layer(s_vs_layer),false);
+    if (!s_displaycountdown){
+      s_displaytimer=time(NULL);
+      s_displaycountdown=true;
     }
-    else
-    {
-      layer_set_hidden(text_layer_get_layer(s_time_layer),false);
-      layer_set_hidden(text_layer_get_layer(s_date_layer),false);
-      layer_set_hidden(text_layer_get_layer(s_countdown_layer),true);
-      layer_set_hidden(text_layer_get_layer(s_vs_layer),true);
-    }
-    
 }
 
 static void batterie_handler(BatteryChargeState charge)
