@@ -27,7 +27,7 @@ typedef struct {
 
 
 // Time calculated from https://www.aritso.net/mehr-informationen/tools/timestampconverter.htm
-// locatime UTC+2 !!!
+// locatime UTC+1 !!!
 static GameDay s_game_day[] = {
  { .name = "vs Unicorns", .time = 1434819600, .home = true },
  { .name = "vs Huskies", .time = 1437764400, .home = true },
@@ -128,14 +128,14 @@ static void update_time() {
   if (s_displaycountdown)
   {
     show_time_or_countdown();
-    time_t temptime = time(NULL); 
+    time_t temptime = time(NULL); // hack works only in west Europe
     int timetodisplay=(int)(temptime-s_displaytimer);
     if (timetodisplay<3){
       static char diffbuffer[] = "000:00:00:00";
       bool found=false;
       for (int i=0;i<NUM_GAMEDAYS;i++){
         GameDay *gameday = &s_game_day[i];
-        time_t diff=difftime(gameday->time,temptime);
+        time_t diff=difftime(gameday->time,temptime+60*60);
         if (diff>=0){
           int nDays,nHours,nMinutes,nSeconds;
           nDays=(int)diff/(60*60*24);
