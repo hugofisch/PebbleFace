@@ -29,13 +29,13 @@ typedef struct {
 // Time calculated from https://www.aritso.net/mehr-informationen/tools/timestampconverter.htm
 // locatime UTC+2 !!!
 static GameDay s_game_day[] = {
- { .name = "vs Unicorns", .time = 1434816000, .home = true },
- { .name = "vs Huskies", .time = 1437840000, .home = true },
- { .name = "Hurricanes vs", .time = 1438437600, .home = false },
-{ .name = "vs Rebbels", .time = 1439042400, .home = true },
-  { .name = "Huskies vs", .time = 1439650800, .home = false },
-  { .name = "Panther vs", .time = 1440255600, .home = false },
-  { .name = "vs Adler", .time = 1441468800, .home = true }
+ { .name = "vs Unicorns", .time = 1434819600, .home = true },
+ { .name = "vs Huskies", .time = 1437764400, .home = true },
+ { .name = "Hurricanes vs", .time = 1438441200, .home = false },
+{ .name = "vs Rebbels", .time = 1439046000, .home = true },
+  { .name = "Huskies vs", .time = 1439654400, .home = false },
+  { .name = "Panther vs", .time = 1440259200, .home = false },
+  { .name = "vs Adler", .time = 1441472400, .home = true }
 };
 
 
@@ -130,7 +130,7 @@ static void update_time() {
     show_time_or_countdown();
     time_t temptime = time(NULL); 
     int timetodisplay=(int)(temptime-s_displaytimer);
-    if (timetodisplay<5){
+    if (timetodisplay<3){
       static char diffbuffer[] = "000:00:00:00";
       bool found=false;
       for (int i=0;i<NUM_GAMEDAYS;i++){
