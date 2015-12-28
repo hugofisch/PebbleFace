@@ -313,8 +313,9 @@ static void init() {
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
  
   //Subscribe to AccelerometerService
-  accel_service_set_sampling_rate(100);
-  accel_tap_service_subscribe(accel_tap_handler);
+  //Disable this feature until new game date are official
+  //accel_service_set_sampling_rate(100);
+  //accel_tap_service_subscribe(accel_tap_handler);
 
   //Subscribe BatterieService
   battery_state_service_subscribe(batterie_handler);
