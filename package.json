@@ -1,0 +1,89 @@
+{
+    "author": "marc.burkhardt@gmx.de",
+    "dependencies": {},
+    "keywords": [],
+    "name": "new-yorker-lions",
+    "pebble": {
+        "capabilities": [
+            "location"
+        ],
+        "displayName": "New Yorker Lions",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": [
+                {
+                    "file": "images/LionsLogosehrklein.png",
+                    "menuIcon": true,
+                    "name": "IMAGE_LIONS_LOGO_SEHRKLEIN",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/LionsLogoklein2.png",
+                    "name": "IMAGE_LIONS_LOGO2",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/bluetoothwhiteNOTOK.png",
+                    "name": "IMAGE_BLUETOOTH_WHITE_NOTOK",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/bluetoothwhiteOK.png",
+                    "name": "IMAGE_BLUETOOTH_WHITE_OK",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/bluetoothOK.png",
+                    "name": "IMAGE_BLUETOOTH_OK",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/batterie75.png",
+                    "name": "IMAGE_BATTERY_75",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/batterieempty.png",
+                    "name": "IMAGE_BATTERY_EMPTY",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/batteriepower.png",
+                    "name": "IMAGE_BATTERY_CHARGE",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/batteriefull.png",
+                    "name": "IMAGE_BATTERY_FULL",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/batterie50.png",
+                    "name": "IMAGE_BATTERY_50",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/batterie25.png",
+                    "name": "IMAGE_BATTERY_25",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/bluetoothNOK.png",
+                    "name": "IMAGE_BLUETOOTH_NOTOK",
+                    "type": "bitmap"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "basalt"
+        ],
+        "uuid": "7c950a0a-8051-4072-9958-7c5304bc09e1",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "1.0.0"
+}
